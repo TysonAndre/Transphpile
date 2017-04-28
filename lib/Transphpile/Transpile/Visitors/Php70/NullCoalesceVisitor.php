@@ -9,11 +9,13 @@ use PhpParser\NodeVisitorAbstract;
 /*
  * Converts $a ?? $b into:
  *
- *      call_user_func(
- *          function ($v1, $v2) { return isset($v1) ? $v1 : $v2; },
- *          @$a,
- *          @$b
- *      )
+ *      [
+ *          call_user_func(
+ *              function($v1) { return $v1 !== null ? array($v1) : null; },
+ *              $a
+ *          ) ?:
+ *          $b
+ *      ][0]
  *
  * This construct is needed because isset() only works on variables, while the null coalesce supports any expression.
  * We also add a @ operator to the variable, in case it doesn't exist so it does not throw a notice.
@@ -22,6 +24,7 @@ use PhpParser\NodeVisitorAbstract;
 
 class NullCoalesceVisitor extends NodeVisitorAbstract
 {
+
     public function leaveNode(Node $node)
     {
         if (!$node instanceof Node\Expr\BinaryOp\Coalesce) {
@@ -29,10 +32,9 @@ class NullCoalesceVisitor extends NodeVisitorAbstract
         }
 
         // Create closure node
-        $closureNode = new Node\Expr\Closure(array(
+        $closureLHSNode = new Node\Expr\Closure(array(
             'params' => array(
                 new Node\Param('v1'),
-                new Node\Param('v2'),
             ),
             'stmts' => array(
                 new Node\Stmt\Return_(
@@ -40,23 +42,33 @@ class NullCoalesceVisitor extends NodeVisitorAbstract
                         new Node\Expr\Isset_(array(
                             new Node\Expr\Variable('v1'),
                         )),
-                        new Node\Expr\Variable('v1'),
-                        new Node\Expr\Variable('v2')
+                        new Node\Expr\Array_([
+                            new Node\Expr\ArrayItem(
+                                new Node\Expr\Variable('v1')
+                            ),
+                        ]),
+                        new Node\Expr\ConstFetch(new Node\Name('null'))
                     )
                 )
             )
         ));
 
         // Create call_user_func() call
-        $callUserFuncNode = new Node\Expr\FuncCall(
-            new Node\Name('call_user_func'),
+        // Implementation of coalesce LHS
+        $coalesceLhs = new Node\Expr\FuncCall(
+            new Node\Name\FullyQualified('call_user_func'),
             array(
-                $closureNode,
+                $closureLHSNode,
                 new Node\Expr\ErrorSuppress($node->left),
-                new Node\Expr\ErrorSuppress($node->right),
             )
         );
 
-        return $callUserFuncNode;
+        $inner = new Node\Expr\Ternary($coalesceLhs, null, new Node\Expr\Array_([
+            new Node\Expr\ArrayItem(
+                $node->right
+            ),
+        ]));
+
+        return new Node\Expr\ArrayDimFetch($inner, new Node\Scalar\LNumber(0));
     }
 }

@@ -34,7 +34,7 @@ class FunctionalTestCase extends TestCase
 
         // Create temp file for code to transpile
         $tmpPath = tempnam(sys_get_temp_dir(), 'transphpile');
-        file_put_contents($tmpPath, "<?php\n" . $config['code']);
+        file_put_contents($tmpPath, "<"."?php\n" . $config['code']);
 
         // Transpile code and send to stdout
         $transpiler = new Transpile($symfonyio);

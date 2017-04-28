@@ -40,7 +40,7 @@ class ReturnVisitor extends NodeVisitorAbstract
 
         // Define uniq retvar for returning, most likely not needed but done to make sure we don't
         // hit any existing variables or multiple return vars
-        $retVar = 'ret'.uniqid('', true);
+        $retVar = 'ret'.uniqid();
 
         // Generate code for "$retVar = <originalExpression>"
         $retNode = new Node\Expr\Assign(
@@ -61,7 +61,7 @@ class ReturnVisitor extends NodeVisitorAbstract
         if (in_array($returnType, array('string', 'bool', 'int', 'float', 'array'))) {
             // Scalars are treated a bit different
             $code = sprintf(
-                '<?php '."\n".
+                '<'.'?php '."\n".
                 '  if (! is_%s($'.$retVar.')) { '."\n".
                 '    throw new \InvalidArgumentException("Argument returned must be of the type %s, ".gettype($'.$retVar.')." given"); '."\n".
                 '  } '."\n".
@@ -71,7 +71,7 @@ class ReturnVisitor extends NodeVisitorAbstract
         } else {
             // Otherwise use is_a for check against classes
             $code = sprintf(
-                '<?php '."\n".
+                '<'.'?php '."\n".
                 '  if (! $'.$retVar.' instanceof %s) { '."\n".
                 '    throw new \InvalidArgumentException("Argument returned must be of the type %s, ".(gettype($'.$retVar.') == "object" ? get_class($'.$retVar.') : gettype($'.$retVar.'))." given"); '."\n".
                 '  } '."\n".
@@ -81,6 +81,7 @@ class ReturnVisitor extends NodeVisitorAbstract
         }
 
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+        // echo "Going to parse\n$code\n// END OF CODE\n\n";
         $stmts = $parser->parse($code);
 
         // Merge $retVar = <expr> with remainder code

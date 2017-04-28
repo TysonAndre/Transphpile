@@ -84,6 +84,9 @@ class Transpile
 
             // Convert path into FQCN
             $class = $fileInfo->getPathname();
+            if (!preg_match('@\.php$@', $class)) {
+                continue;
+            }
             $class = str_replace($baseFqcnPath, "", $class);
             $class = str_replace('.php', '', $class);
             $class = str_replace('/', '\\', $class);
