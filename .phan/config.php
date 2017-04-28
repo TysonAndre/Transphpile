@@ -96,6 +96,7 @@ return [
     // Add any issue types (such as 'PhanUndeclaredMethod')
     // here to inhibit them from being reported
     'suppress_issue_types' => [
+        'PhanDeprecatedProperty',
         // 'PhanUndeclaredMethod',
     ],
 

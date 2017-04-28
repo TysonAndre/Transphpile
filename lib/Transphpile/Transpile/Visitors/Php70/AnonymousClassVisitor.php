@@ -100,7 +100,7 @@ class AnonymousClassVisitor extends NodeVisitorAbstract
             }
         }
 
-        if ($ret !== null) {
+        if (!is_null($ret)) {
             return $ret;
         }
 
