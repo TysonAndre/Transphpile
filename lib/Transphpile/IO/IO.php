@@ -7,7 +7,7 @@ trait IO
     protected $io;
 
     /**
-     * @return mixed
+     * @return IOInterface
      */
     public function getIO()
     {
