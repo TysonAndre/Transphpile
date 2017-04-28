@@ -90,7 +90,7 @@ class AnonymousClassVisitor extends NodeVisitorAbstract
     protected function getAnonymousClassHookIndex(array $stmts)
     {
         // Find the first statement that is not a declare, namespace or use-statement
-        $ret = false;
+        $ret = null;
         foreach ($stmts as $idx => $stmt) {
             if (! $stmt instanceof Declare_ &&
                 ! $stmt instanceof Use_ &&
@@ -100,7 +100,7 @@ class AnonymousClassVisitor extends NodeVisitorAbstract
             }
         }
 
-        if ($ret !== false) {
+        if ($ret !== null) {
             return $ret;
         }
 

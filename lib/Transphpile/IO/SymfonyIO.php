@@ -7,6 +7,9 @@ use Symfony\Component\Console\Output\OutputInterface as SymfonyOutputInterface;
 
 class SymfonyIO implements IOInterface
 {
+    public $input;
+    public $output;
+
     public function __construct(SymfonyInputInterface $input, SymfonyOutputInterface $output)
     {
         $this->input = $input;

@@ -20,6 +20,9 @@ class SymfonyIOTest extends TestCase
     /** @var IOInterface */
     protected $symfonyio;
 
+    /** @var resource */
+    protected $stream;
+
     protected function createOutput($level)
     {
         $definition = new InputDefinition(array(

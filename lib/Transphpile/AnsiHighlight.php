@@ -8,7 +8,7 @@ class AnsiHighlight
     /**
      * Converts PHP code into highlighted syntax using ANSI escape codes to pretty print on console.
      *
-     * @param $str
+     * @param string $str
      * @return string
      */
     public function highlight($str)

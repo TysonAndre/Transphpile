@@ -68,15 +68,15 @@ class Graphviz extends PrettyPrinterAbstract
     // Names
 
     public function pName(Name $node) {
-        return implode('\\', $node->parts);
+        return $node->parts->toString();
     }
 
     public function pName_FullyQualified(Name\FullyQualified $node) {
-        return '\\' . implode('\\', $node->parts);
+        return '\\' . $node->parts->toString();
     }
 
     public function pName_Relative(Name\Relative $node) {
-        return 'namespace\\' . implode('\\', $node->parts);
+        return 'namespace\\' . $node->parts->toString();
     }
 
     // Magic Constants
@@ -432,7 +432,7 @@ class Graphviz extends PrettyPrinterAbstract
 
     public function pExpr_List(Expr\List_ $node) {
         $pList = array();
-        foreach ($node->vars as $var) {
+        foreach ($node->items as $var) {
             if (null === $var) {
                 $pList[] = '';
             } else {
@@ -705,13 +705,13 @@ class Graphviz extends PrettyPrinterAbstract
     public function pStmt_TryCatch(Stmt\TryCatch $node) {
         return 'try {' . $this->pStmts($node->stmts) . "\n" . '}'
              . $this->pImplode($node->catches)
-             . ($node->finallyStmts !== null
-                ? ' finally {' . $this->pStmts($node->finallyStmts) . "\n" . '}'
+             . ($node->finally!== null
+                ? ' finally {' . $this->pStmts($node->finally->stmts) . "\n" . '}'
                 : '');
     }
 
     public function pStmt_Catch(Stmt\Catch_ $node) {
-        return ' catch (' . $this->p($node->type) . ' $' . $node->var . ') {'
+        return ' catch (' . $this->p($node->types) . ' $' . $node->var . ') {'
              . $this->pStmts($node->stmts) . "\n" . '}';
     }
 
@@ -772,6 +772,10 @@ class Graphviz extends PrettyPrinterAbstract
 
     // Helpers
 
+    /**
+     * @param string|Node $node
+     * @return string
+     */
     protected function pType($node) {
         return is_string($node) ? $node : $this->p($node);
     }

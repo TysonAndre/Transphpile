@@ -40,7 +40,7 @@ class ReturnVisitor extends NodeVisitorAbstract
 
         // Define uniq retvar for returning, most likely not needed but done to make sure we don't
         // hit any existing variables or multiple return vars
-        $retVar = 'ret'.uniqid(true);
+        $retVar = 'ret'.uniqid('', true);
 
         // Generate code for "$retVar = <originalExpression>"
         $retNode = new Node\Expr\Assign(
