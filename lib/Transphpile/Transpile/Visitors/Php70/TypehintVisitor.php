@@ -55,8 +55,14 @@ class TypehintVisitor extends NodeVisitorAbstract
         // Remove scalar types and store for later
         $params = array();
         foreach ($node->params as $param) {
-            if (in_array($param->type, array('string', 'int', 'float', 'bool'))) {
-                $canBeNull = false;
+            $canBeNull = false;
+            // It can be null if it's a nullable type (string $x), or if it has a default of null (string $x = null)
+            $paramType = $param->type;
+            if ($paramType instanceof Node\NullableType) {
+                $paramType = $paramType->type;
+                $canBeNull = true;
+            }
+            if (in_array(strtolower((string)$paramType), array('string', 'int', 'float', 'bool'), true)) {
                 if ($param->default != null) {
                     if ($param->default instanceof Node\Expr\ConstFetch) {
                         if ($param->default->name->parts[0] == "null") {
@@ -66,7 +72,7 @@ class TypehintVisitor extends NodeVisitorAbstract
                 }
 
                 $params[] = array(
-                    'type' => $param->type,
+                    'type' => $paramType,
                     'arg' => $param->name,
                     'func' => $node->name,
                     'nullable' => $canBeNull,

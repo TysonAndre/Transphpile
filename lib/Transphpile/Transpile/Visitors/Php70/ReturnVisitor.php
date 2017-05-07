@@ -50,7 +50,18 @@ class ReturnVisitor extends NodeVisitorAbstract
 
         // Generate remainder code
 
-        $returnType = (string)$functionNode->returnType;
+        $is_nullable = false;
+        $returnTypeNode = $functionNode->returnType;
+        if ($returnTypeNode instanceof Node\NullableType) {
+            $returnTypeNode = $returnTypeNode->type;
+            $is_nullable = true;
+        }
+        if ($is_nullable) {
+            $nullCheck = '$'.$retVar.' !== null && ';
+        } else {
+            $nullCheck = '';
+        }
+        $returnType = (string)$returnTypeNode;
         // Manually add starting namespace separator for FQCN
         if ($functionNode->returnType instanceof Node\Name\FullyQualified && $returnType[0] != '\\') {
             $returnType = '\\' . $returnType;
@@ -62,7 +73,7 @@ class ReturnVisitor extends NodeVisitorAbstract
             // Scalars are treated a bit different
             $code = sprintf(
                 '<'.'?php '."\n".
-                '  if (! is_%s($'.$retVar.')) { '."\n".
+                '  if ('.$nullCheck.'! is_%s($'.$retVar.')) { '."\n".
                 '    throw new \InvalidArgumentException("Argument returned must be of the type %s, ".gettype($'.$retVar.')." given"); '."\n".
                 '  } '."\n".
                 '  return $'.$retVar.'; ',
@@ -72,7 +83,7 @@ class ReturnVisitor extends NodeVisitorAbstract
             // Otherwise use is_a for check against classes
             $code = sprintf(
                 '<'.'?php '."\n".
-                '  if (! $'.$retVar.' instanceof %s) { '."\n".
+                '  if (' .$nullCheck.' ! $'.$retVar.' instanceof %s) { '."\n".
                 '    throw new \InvalidArgumentException("Argument returned must be of the type %s, ".(gettype($'.$retVar.') == "object" ? get_class($'.$retVar.') : gettype($'.$retVar.'))." given"); '."\n".
                 '  } '."\n".
                 '  return $'.$retVar.'; ',
