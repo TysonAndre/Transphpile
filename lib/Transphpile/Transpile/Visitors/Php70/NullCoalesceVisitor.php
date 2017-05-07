@@ -9,13 +9,15 @@ use PhpParser\NodeVisitorAbstract;
 /*
  * Converts $a ?? $b into:
  *
- *      [
+ *      reset([
  *          call_user_func(
  *              function($v1) { return $v1 !== null ? array($v1) : null; },
  *              $a
  *          ) ?:
  *          $b
- *      ][0]
+ *      ])
+ *
+ * (Can't use (expr)[0] in php 5.6)
  *
  * This construct is needed because isset() only works on variables, while the null coalesce supports any expression.
  * We also add a @ operator to the variable, in case it doesn't exist so it does not throw a notice.
@@ -69,6 +71,11 @@ class NullCoalesceVisitor extends NodeVisitorAbstract
             ),
         ]));
 
-        return new Node\Expr\ArrayDimFetch($inner, new Node\Scalar\LNumber(0));
+        return new Node\Expr\FuncCall(
+            new Node\Name\FullyQualified('reset'),
+            array(
+                $inner
+            )
+        );
     }
 }

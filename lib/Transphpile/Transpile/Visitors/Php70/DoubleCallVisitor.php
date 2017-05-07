@@ -30,15 +30,16 @@ class DoubleCallVisitor extends NodeVisitorAbstract
             return null;
         }
         // Can't call ClassName::foo(type)(args) or (new Visitor())(args) in php5
-        if (($name instanceof PhpParser\Node\Expr\MethodCall) ||
-            ($name instanceof PhpParser\Node\Expr\FuncCall) ||
-            ($name instanceof PhpParser\Node\Expr\New_)) {
+        if (($name instanceof Node\Expr\MethodCall) ||
+            ($name instanceof Node\Expr\StaticCall) ||
+            ($name instanceof Node\Expr\FuncCall) ||
+            ($name instanceof Node\Expr\New_)) {
 
             // Create call_user_func() call
             return new Node\Expr\FuncCall(
                 new Node\Name('call_user_func'),
                 array_merge(
-                    array($node->left),
+                    array($name),
                     $node->args
                 )
             );
