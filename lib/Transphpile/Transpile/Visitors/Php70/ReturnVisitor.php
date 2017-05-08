@@ -50,13 +50,13 @@ class ReturnVisitor extends NodeVisitorAbstract
 
         // Generate remainder code
 
-        $is_nullable = false;
+        $isNullable = false;
         $returnTypeNode = $functionNode->returnType;
         if ($returnTypeNode instanceof Node\NullableType) {
             $returnTypeNode = $returnTypeNode->type;
-            $is_nullable = true;
+            $isNullable = true;
         }
-        if ($is_nullable) {
+        if ($isNullable) {
             $nullCheck = '$'.$retVar.' !== null && ';
         } else {
             $nullCheck = '';
@@ -69,10 +69,10 @@ class ReturnVisitor extends NodeVisitorAbstract
 
         // @TODO: It might be easier to read when we generate ALL code directly from Nodes instead of generating it
 
-        if (in_array($returnType, array('string', 'bool', 'int', 'float', 'array'))) {
+        if (in_array(strtolower($returnType), array('string', 'bool', 'int', 'float', 'array'), true)) {
             // Scalars are treated a bit different
             $code = sprintf(
-                '<'.'?php '."\n".
+                '<?php '."\n".
                 '  if ('.$nullCheck.'! is_%s($'.$retVar.')) { '."\n".
                 '    throw new \InvalidArgumentException("Argument returned must be of the type %s, ".gettype($'.$retVar.')." given"); '."\n".
                 '  } '."\n".
@@ -82,8 +82,8 @@ class ReturnVisitor extends NodeVisitorAbstract
         } else {
             // Otherwise use is_a for check against classes
             $code = sprintf(
-                '<'.'?php '."\n".
-                '  if (' .$nullCheck.' ! $'.$retVar.' instanceof %s) { '."\n".
+                '<?php '."\n".
+                '  if ('.$nullCheck.' ! $'.$retVar.' instanceof %s) { '."\n".
                 '    throw new \InvalidArgumentException("Argument returned must be of the type %s, ".(gettype($'.$retVar.') == "object" ? get_class($'.$retVar.') : gettype($'.$retVar.'))." given"); '."\n".
                 '  } '."\n".
                 '  return $'.$retVar.'; ',
@@ -92,7 +92,6 @@ class ReturnVisitor extends NodeVisitorAbstract
         }
 
         $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
-        // echo "Going to parse\n$code\n// END OF CODE\n\n";
         $stmts = $parser->parse($code);
 
         // Merge $retVar = <expr> with remainder code
