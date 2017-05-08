@@ -9,19 +9,24 @@ use PhpParser\NodeVisitorAbstract;
 /*
  * Converts $a ?? $b into:
  *
- *      reset([
+ *      call_user_func(
+ *          function($v1) { return $v1[0]; },
  *          call_user_func(
  *              function($v1) { return $v1 !== null ? array($v1) : null; },
- *              $a
- *          ) ?:
- *          $b
- *      ])
+ *              @$a
+ *          ) ?: [$b]
+ *      )
  *
  * (Can't use (expr)[0] in php 5.6)
+ * (Can't use reset(expr) in php 7.0+ without a warning about taking a reference on non-reference)
  *
- * This construct is needed because isset() only works on variables, while the null coalesce supports any expression.
+ * This construct is sometimes needed because isset() only works on variables, while the null coalesce supports any expression.
  * We also add a @ operator to the variable, in case it doesn't exist so it does not throw a notice.
  *
+ * TODO: Can optimize/simplify the cases where the left hand side is always simple,
+ * and avoid method calls (Assume ArrayAccess is implemented properly).
+ *
+ * - e.g. convert `$x->y['key'] ?? DEFAULT` into `isset($x->y['key']) ? $x->y['key'] : DEFAULT`
  */
 
 class NullCoalesceVisitor extends NodeVisitorAbstract
@@ -71,10 +76,32 @@ class NullCoalesceVisitor extends NodeVisitorAbstract
             ),
         ]));
 
+        return $this->buildGetFirstElement($inner);
+    }
+
+    /**
+     * @return Node PHP code to fetch the first element
+     */
+    private function buildGetFirstElement(Node $node) {
+        // This closure does the same thing as `new Node\Name\FullyQualified('reset')`
+        // but avoids the notice about taking a reference of a non-reference in php7.0+
+        $closureLHSNode = new Node\Expr\Closure(array(
+            'params' => array(
+                new Node\Param('v1'),
+            ),
+            'stmts' => array(
+                new Node\Stmt\Return_(
+                    new Node\Expr\ArrayDimFetch(
+                        new Node\Expr\Variable('v1'),
+                        new Node\Scalar\LNumber(0)
+                    )
+                )
+            )
+        ));
         return new Node\Expr\FuncCall(
-            new Node\Name\FullyQualified('reset'),
+            $closureLHSNode,
             array(
-                $inner
+                $node
             )
         );
     }
