@@ -99,9 +99,10 @@ class NullCoalesceVisitor extends NodeVisitorAbstract
             )
         ));
         return new Node\Expr\FuncCall(
-            $closureLHSNode,
+            new Node\Name\FullyQualified('call_user_func'),
             array(
-                $node
+                $closureLHSNode,
+                $node,
             )
         );
     }
