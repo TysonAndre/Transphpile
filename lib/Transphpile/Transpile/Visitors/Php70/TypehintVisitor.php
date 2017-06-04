@@ -62,7 +62,7 @@ class TypehintVisitor extends NodeVisitorAbstract
                 $paramType = $paramType->type;
                 $canBeNull = true;
             }
-            // TODO: PHP 7.1 added iterable as a param type and return type, use is_iterable() for that check
+            // TODO: PHP 7.1 added iterable as a param type and return type, use is_array($x) || ($x instanceof Traversable) for that check?
             if (in_array(strtolower((string)$paramType), array('string', 'int', 'float', 'bool'), true)) {
                 if ($param->default != null) {
                     if ($param->default instanceof Node\Expr\ConstFetch) {
@@ -81,6 +81,8 @@ class TypehintVisitor extends NodeVisitorAbstract
                 $param->type = null;
             } else if ($canBeNull && $param->default === null) {
                 // Workaround for nullable types.
+                // This may cause issues if subclasses are nullable and base classes aren't,
+                // but that shouldn't be frequent.
                 $param->default = new Node\Expr\ConstFetch(
                     new Node\Name(['null'])
                 );
