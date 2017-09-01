@@ -8,7 +8,6 @@
         "name": "Joshua Thijssen",
         "email": "jthijssen@noxlogic.nl"
     }],
-
     "autoload": {
         "psr-4": {"Transphpile\\": "lib/Transphpile"}
     },
@@ -19,7 +18,7 @@
     "bin": [ "bin/transphpile" ],
     "require": {
         "php": "^5.4|^7.0",
-        "nikic/php-parser": "~3.0.5",
+        "nikic/php-parser": "~3.1.0",
         "symfony/console": "^2.8|^3.0",
         "symfony/finder": "^2.8|^3.0",
         "symfony/yaml": "^2.8|^3.0"

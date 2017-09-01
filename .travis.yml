@@ -18,4 +18,4 @@ matrix:
     - php: nightly
   fast_finish: true
 
-script: PHPRC=$PWD/lib/Transphpile/Tests/phprc vendor/bin/phpunit
+script: ./test.sh
