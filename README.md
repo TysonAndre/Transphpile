@@ -1,8 +1,10 @@
-Transphpile: A PHP 7 to PHP 5.6 transpiler
-==========================================
+Transphpile: A PHP 7 to PHP 5.6 transpiler (fork)
+=================================================
 
-This transpiler lets you write PHP7 code and converts it back to equal PHP5.6 so you can run in on older PHP versions. 
-The transpiler itself does not need PHP7: it can convert PHP7 code even on a PHP5.4 system.
+This fork supports php 5.6\+
+
+This transpiler lets you write PHP7 code and converts it back to equal PHP5.6 so you can run in on older PHP versions.
+The transpiler itself does not need PHP7: it can convert PHP7 code even on a PHP5.6 system.
 
 **This is heavy beta stuff that isn't even worthy of a 0.x semver release.. But the most used PHP7 functionality (typehinting, mostly), is functional. Do not use in production or else you well have a very bad day (and don't go into space)**
 
@@ -10,15 +12,15 @@ The transpiler itself does not need PHP7: it can convert PHP7 code even on a PHP
 Usage
 =====
 
-Downloading and installing the transpiler: 
+Downloading and installing the transpiler:
 
     composer require jaytaph/transphpile
     ./vendor/bin/transphpile help
-        
+
 Transpiling a single file:
-    
+
     ./vendor/bin/transphpile transpile test.php --stdout
-    
+
 Transpiling a directory of files:
 
     ./vendor/bin/transphpile transpile src --dest php5
@@ -27,11 +29,11 @@ Transpiling a directory of files:
 Phar file
 =========
 
-The transpiler can function as a phar file too. Current documentation still has to be setup on how to download. 
+The transpiler can function as a phar file too. Current documentation still has to be setup on how to download.
 Creation can be done manually by running:
- 
+
     ./vendor/bin/phar-composer build .
-    
+
 inside the transphpile repository.
 
 
@@ -59,9 +61,9 @@ Theoretically, you should be able to transpile all your PHP7 code and run it aga
 Todo
 ====
 
-A lot: 
-* Get things up and running more decent. 
-* Fix up code, make sure that transpiled code works properly (even for instance when we use transpiled code in for instance `isset()` of comparisions and other features).
+A lot:
+* Get things up and running more decent.
+* Fix up code, make sure that transpiled code works properly (even for instance when we use transpiled code in for instance `isset()` of comparisons and other features).
 * Fix up the unit-tests, make them more fool-proof.
 
 The transpiler however is not able to transpile the following due to the fact that it's very hard to emulate the functionality even in a PHP5.6 environment:
