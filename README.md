@@ -1,7 +1,9 @@
 Transphpile: A PHP 7 to PHP 5.6 transpiler (fork)
 =================================================
 
-This fork supports php 5.6\+
+[![Build Status(fork)](https://travis-ci.org/TysonAndre/Transphpile.svg?branch=master)](https://travis-ci.org/TysonAndre/Transphpile)
+
+This fork can be executed on php 5.6\+.
 
 This transpiler lets you write PHP7 code and converts it back to equal PHP5.6 so you can run in on older PHP versions.
 The transpiler itself does not need PHP7: it can convert PHP7 code even on a PHP5.6 system.
