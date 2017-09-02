@@ -60,7 +60,7 @@ class FunctionalTestCase extends TestCase
 
         // Check output
         $config['stdout'] = trim($config['stdout']);
-        $this->assertRegExp('{'.$config['stdout'].'}', $stdout, isset($config['name']) ? $config['name'] : "");
+        $this->assertRegExp('{'.$config['stdout'].'}', $stdout, (isset($config['name']) ? $config['name'] : "") . ": stderr:\n$stderr");
 
         // Check stderr if any
         // (When running this test, make sure that the ini setting display_errors=stderr is set)
