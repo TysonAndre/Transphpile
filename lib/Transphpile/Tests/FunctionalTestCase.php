@@ -48,6 +48,8 @@ class FunctionalTestCase extends TestCase
         $php5 = stream_get_contents($stream);
 
         // Run php5 code
+        // TODO: Easier to add CLI options to enable this, https://api.symfony.com/3.0/Symfony/Component/Process/PhpProcess.html doesn't document how
+        $this->assertSame("stderr", ini_get('display_errors'), 'should run this test with display_errors=stderr in php ini settings');
         $process = new PhpProcess($php5);
         $process->run();
         $stdout = $process->getOutput();
